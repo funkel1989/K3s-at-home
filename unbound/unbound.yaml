@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: unbound
+  name: unbound
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unbound
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: unbound
+    spec:
+      containers:
+      - image: mvance/unbound-rpi
+        name: unbound-rpi
+        volumeMounts:
+        - mountPath: "/opt/unbound/etc/unbound"
+          name: config
+        securityContext:
+          privileged: true
+        resources: {}
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: unbound
