@@ -20,14 +20,19 @@ There are some prerequisits before installing K3s.
 This updates and uprades packages and other OS bits.
 
 Raspberry OS defaults to using nftables instead of iptables. K3S networking features require iptables and do not work with nftables. Follow the steps below to switch configure the OS to use legacy iptables:
+
 4.  sudo iptables -F
+
 5.  sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+
 6.  sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+
 7.  sudo reboot
 Standard Raspberry OS installations do not start with cgroups enabled. K3S needs cgroups to start the systemd service. cgroups can be enabled by appending cgroup_memory=1 cgroup_enable=memory to /boot/cmdline.txt.
 
 8. sudo nano /boot/cmdline.txt, append cgroup_memory=1 cgroup_enable=memory to the end of the line like so:
 console=serial0,115200 console=tty1 root=PARTUUID=58b06195-02 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait cgroup_memory=1 cgroup_enable=memory
+
 9. sudo reboot
 
 I installed master node with curl -sfL https://get.k3s.io | sh -
@@ -102,9 +107,12 @@ See this comment for steps to do this, it worked great for me, https://github.co
 I am debating whether to keep this volume for Unbound.  I really did it so I can keep root.hints up to date, I don't know if I will keep up with it or not.  Might be too much trouble if I start fiddling with the settings and I break the container, then I would need to mount the image and fix it.  A little clunky and I know this because I have already broken it twice adding some settings.
 
 A. kubectl apply -f unbound-pvc.yaml -n pihole
+
 --this is where you want to mound the volume and copy in the config files)
 B. kubectl apply -f unbound.yaml -n pihole
+
 C. kubectl apply -f unbound-svc.yaml -n pihole
+
 
 Yes I know this can all go into one file and namespaces can be hardcoded, I'm lazy.  
 Further, since the Unbound container can move around the cluster, the service defintion has the ClusterIP hard coded, it's an internal IP to the cluster.  Make sure no other service has this IP in your cluster.  I wanted to have a "Statically" configured IP so that pihole could always find the Unbound service
