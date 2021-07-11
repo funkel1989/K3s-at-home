@@ -19,7 +19,7 @@ serviceDhcp:
     metallb.universe.tf/allow-shared-ip: pihole-svc
   type: LoadBalancer
 
-adminPassword: Z3brac0de
+adminPassword: adminpw
 
 DNS1: "10.43.0.2#5335"
 DNS2: "10.43.0.2#5335"
