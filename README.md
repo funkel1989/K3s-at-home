@@ -52,9 +52,11 @@ I prefer to use MetalLB instead of the stock K3s load balancer (Klipper) becuase
 I do not need local storage, as it defeats the pupose of failover if the data for the pod isn't also on the node the pod is running on, I will be using another storage solution later in this document.  
 I also prefer to use nginx ingress instead of Traefik.  Both of these swaps are optional.  It's just preference.  If you swap them, you need to install K3s without these options:
 
-I installed master node with curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC=" --disable traefik --disable servicelb --disable local-storage" sh -
+I installed master node with 
+- curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC=" --disable traefik --disable servicelb --disable local-storage" sh -
 
-I installed worker nodes with curl -sfL https://get.k3s.io | K3S_URL=https://<myserver>:6443 K3S_TOKEN=<mynodetoken> sh -
+I installed worker nodes with 
+- curl -sfL https://get.k3s.io | K3S_URL=https://<myserver>:6443 K3S_TOKEN=<mynodetoken> sh -
 You can checkout the quick start guide on the K3s website.  Be sure to replace the values above with your own.  
 
 Be sure to configure your client machine for kubectl and helm so you can access your cluster, you will need them.  If you are on mac, you can use homebrew to install both.
