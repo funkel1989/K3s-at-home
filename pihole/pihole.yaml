@@ -2,24 +2,24 @@ persistentVolumeClaim:
   enabled: true
 
 serviceWeb:
-  loadBalancerIP: 10.0.0.3
+  loadBalancerIP: 10.0.0.4
   annotations:
     metallb.universe.tf/allow-shared-ip: pihole-svc
   type: LoadBalancer
 
 serviceDns:
-  loadBalancerIP: 10.0.0.3
+  loadBalancerIP: 10.0.0.4
   annotations:
     metallb.universe.tf/allow-shared-ip: pihole-svc
   type: LoadBalancer
 
 serviceDhcp:
-  loadBalancerIP: 10.0.0.3
+  loadBalancerIP: 10.0.0.4
   annotations:
     metallb.universe.tf/allow-shared-ip: pihole-svc
   type: LoadBalancer
 
-adminPassword: adminpw-is-insecure
+adminPassword: admin
 
 DNS1: "10.43.0.2#5335"
 DNS2: "10.43.0.2#5335"
@@ -27,5 +27,6 @@ DNS2: "10.43.0.2#5335"
 extraEnvVars:
   TZ: America/New_York
 
+hostNetwork: "true"
 privileged: "true"
 

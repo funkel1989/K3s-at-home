@@ -20,13 +20,6 @@ spec:
       containers:
       - image: mvance/unbound-rpi
         name: unbound-rpi
-        volumeMounts:
-        - mountPath: "/opt/unbound/etc/unbound"
-          name: config
         securityContext:
           privileged: true
         resources: {}
-      volumes:
-        - name: config
-          persistentVolumeClaim:
-            claimName: unbound
