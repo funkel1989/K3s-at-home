@@ -37,20 +37,16 @@ gonzo - 10.0.0.228
 
 Raspberry OS defaults to using nftables instead of iptables. K3S networking features require iptables and do not work with nftables. Follow the steps below to switch configure the OS to use legacy iptables:
 
-4.  sudo iptables -F
-
-5.  sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
-
-6.  sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
-
-7.  sudo reboot
+- sudo iptables -F
+- sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+- sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+- sudo reboot
 
 Standard Raspberry OS installations do not start with cgroups enabled. K3S needs cgroups to start the systemd service. cgroups can be enabled by appending cgroup_memory=1 cgroup_enable=memory to /boot/cmdline.txt.
 
-8. sudo nano /boot/cmdline.txt, append cgroup_memory=1 cgroup_enable=memory to the end of the line like so:
+- sudo nano /boot/cmdline.txt, append cgroup_memory=1 cgroup_enable=memory to the end of the line like so:
 console=serial0,115200 console=tty1 root=PARTUUID=58b06195-02 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait cgroup_memory=1 cgroup_enable=memory
-
-9. sudo reboot
+- sudo reboot
 
 I prefer to use MetalLB instead of the stock K3s load balancer (Klipper) becuase MetalLB will assign 1 IP address per service for the entire cluster.  
 I do not need local storage, as it defeats the pupose of failover if the data for the pod isn't also on the node the pod is running on, I will be using another storage solution later in this document.  
