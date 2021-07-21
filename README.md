@@ -96,7 +96,7 @@ Delete the deployment and serviecs
 - kubectl svc deploy nginx nginx2
 
 A good cluster needs some monitoring.  I have choosen to use https://github.com/carlosedp/cluster-monitoring by https://github.com/carlosedp
-This is a tuned monitoring solution for Raspberry Pis, and K3s.  You can the monitoring manifests in this repo.  
+This is a tuned monitoring solution for Raspberry Pis, and K3s.  You can use the monitoring manifests in this repo.  
 You will need build-essential installed on your host where you are compiling this project.  
 - sudo apt update && sudo apt install build-essentail -y
 You will need to edit the vars.jsonet file per the quick start guide on the link above.  then run:
@@ -168,3 +168,93 @@ To install HA:
 helm install home-assistant -n home-assistant k8s-at-home/home-assistant --values values.yaml --create-namespace
 
 Failover testing.  I was able to drain a node (kubectl drain kermit --ignore-daemonsets --delete-local-data) that services were running on and watch them failover to another node, there is a short interuption to my network and internet access but this is much better than scrambling to get a new pi online or killing the pihole alltogether and removing it from my setup, even if temporarily.  Also I run a lot of lights off of Home assistant, will be nice not to set that up again in case of hardware failure (pi board, sd card, etc).  Failovers work, longhorn replication works, it's all working good... until it's not :-)
+
+Update July 21.
+
+I added another Raspberry PI 4 2GB to the deployment, it's acting as an NFS server:
+dr-bunsen-honeydew - 10.0.0.229 (non-POE-hat, 2TB RAID 0 attached via USB, very old Caldigit drives from 2006)
+
+I decided not all storage can be Longhorn and attached directly to the PIs in the K3s cluster, so I added a new NFS server with some very old, but gently used HDDs. 
+
+The drive is formatted as EXT4
+https://thesecmaster.com/how-to-partition-and-format-the-hard-drives-on-raspberry-pi/
+
+Create partition:
+- sudo parted
+- print all
+- select /dev/sda (this may be different in your case)
+- mklabel gpt
+- print 
+- mkpart data-ext4 ext4 0% 100%
+- q
+
+Now format it.
+- sudo mkfs.ext4 -L data-ext4  /dev/sda1
+
+Now install the NFS server, I used this guide:
+https://www.youtube.com/watch?v=EzqgJhu-qN8
+
+Make a directory where you will mount your disk
+
+- sudo mkdir /kubedata
+
+Get the parition id
+- sudo blkid /dev/sda1
+/dev/sda1: LABEL="data-ext4" UUID="b80edf92-b9ab-44be-8c24-93d684c428db" TYPE="ext4" PARTLABEL="data-ext4" PARTUUID="e5b153e2-015d-4121-b30b-83d727347d47"
+We need the PARTUUID for the next step
+
+Mount the drive when the PI boots
+- sudo nano /etc/fstab
+add a line like this: PARTUUID=e5b153e2-015d-4121-b30b-83d727347d47 /kubedata ext4 defaults,noatime,nodiratime 0 2
+
+Reboot or mount now
+- sudo reboot
+or
+- sudo mount /kubedata
+
+Install the NFS server 
+- sudo apt install -y nfs-kernel-server
+
+Make a directory to export
+- sudo mkdir /kubedata/data
+
+Export the directory to NFS
+- sudo nano /etc/exports
+Add this line:
+/kubedata/data *(rw,sync,no_subtree_check)
+
+Update exports
+- sudo exportfs -ar
+
+Now test the exports from each host in the K3s cluster
+
+- sudo mount -t nfs 10.0.0.229:/kubedata/data /mnt
+
+Test you can write to this directory, I opened up chmod 777 /kubedata/data on nfs server, will investigate later a better approach.
+
+There is a cool project that will auto provision NFS storage for your K3s cluster: 
+https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner
+
+To install using Helm:
+- helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+- helm repo update
+- helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner -n nfs --create-namespace --set nfs.server=10.0.0.229 --set nfs.path=/kubedata/data
+
+Note to update the nfs.server and nfs.path properties to yours.  Also this installs a bunch of stuff in the nfs namespace, as specificed in the helm install command.  Noteable the storage class 
+- kubectl get sc 
+
+NAME                 PROVISIONER                                     RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
+longhorn (default)   driver.longhorn.io                              Delete          Immediate           true                   8d
+nfs-client           cluster.local/nfs-subdir-external-provisioner   Delete          Immediate           true                   112m
+
+The nfs-client is the storage class we want to supply to any deployments in future that we want to use NFS.  
+
+Now I decided to remove my monitoring deployment and make it persistent using my latest storage solution:
+
+- kubectl delete -f manifests/
+- kubectl delete -f manifests/setup/
+
+I edited the vars.jsonnet file for the monitoring project and specified the persistence for both grafana and prometheus to be true and also specificed the nfs-client storage class.   
+
+I recompiled the project using the commands I used above.  I changed the grafana service to be loadbalancer and redeployed.  PVC was created successfully.  
+

@@ -130,12 +130,14 @@ spec:
       nodeSelector:
         beta.kubernetes.io/os: linux
       securityContext:
+        fsGroup: 472
         runAsNonRoot: true
-        runAsUser: 65534
+        runAsUser: 472
       serviceAccountName: grafana
       volumes:
-      - emptyDir: {}
-        name: grafana-storage
+      - name: grafana-storage
+        persistentVolumeClaim:
+          claimName: grafana-storage
       - name: grafana-datasources
         secret:
           secretName: grafana-datasources
