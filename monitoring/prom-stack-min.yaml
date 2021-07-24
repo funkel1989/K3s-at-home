@@ -1,0 +1,44 @@
+alertmanager:
+
+  enabled: false
+
+prometheus:
+
+  prometheusSpec:
+
+    serviceMonitorSelector: {}
+    serviceMonitorNamespaceSelector: {}
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelector: {}
+    podMonitorNamespaceSelector: {}
+    podMonitorSelectorNilUsesHelmValues: false
+
+    ## Prometheus StorageSpec for persistent data
+    ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/user-guides/storage.md
+    ##
+    storageSpec:
+    ## Using PersistentVolumeClaim
+    ##
+      volumeClaimTemplate:
+        spec:
+          storageClassName: nfs-client
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 50Gi
+    
+  ## Configuration for Prometheus service
+  ##
+  service:
+    loadBalancerIP: "10.0.0.6"
+    ## Service type
+    type: LoadBalancer
+
+grafana:
+
+  adminPassword: admin
+  
+  service:
+    loadBalancerIP: "10.0.0.3"
+    ## Service type
+    type: LoadBalancer

@@ -249,12 +249,24 @@ nfs-client           cluster.local/nfs-subdir-external-provisioner   Delete     
 
 The nfs-client is the storage class we want to supply to any deployments in future that we want to use NFS.  
 
-Now I decided to remove my monitoring deployment and make it persistent using my latest storage solution:
+I am removing https://github.com/carlosedp/cluster-monitoring by https://github.com/carlosedp becuase there is very little value here compared to kube-prometheus-stack https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/README.md (which has full multiarch support now).  I am only missing out on the rpi metrics like temperature but I think I can work in the arm-exporter Carlos wrote into my prom stack setup just like I am able to work in speedtest-exporter that comes from https://github.com/MiguelNdeCarvalho/speedtest-exporter by https://github.com/MiguelNdeCarvalho 
 
-- kubectl delete -f manifests/
-- kubectl delete -f manifests/setup/
+To install kube-prometheus-stack all you need to do is:
+- helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+- helm repo update
+- helm install prometheus-stack prometheus-community/kube-prometheus-stack -n mon --create-namespace --values prom-stack-min.yaml
+I did override some chart values to use my NFS storage (even though this goes against Prometheus advice to use local storage, but I don't have much local storage and my setup is small so I'll try it and see how it goes).  I also specified some load balacer IPs as well.  One main this to note in the values are these line:
+    serviceMonitorSelector: {}
+    serviceMonitorNamespaceSelector: {}
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelector: {}
+    podMonitorNamespaceSelector: {}
+    podMonitorSelectorNilUsesHelmValues: false
+These essentailly tell the prometheus operator to pick up all serviceMonitors and podMonitors that are deployed in K3s (important to note that serviceMonitor and podMonitor are custom resource definitions in K3s).  If you leave the default values, Prometheus will only pickup prometheus selectors and speedtest-exporter isn't one of them.
 
-I edited the vars.jsonnet file for the monitoring project and specified the persistence for both grafana and prometheus to be true and also specificed the nfs-client storage class.   
+To install speedtest exporter, curtesy of https://github.com/k8s-at-home/charts
+- helm repo add k8s-at-home https://k8s-at-home.com/charts/ 
+- helm repo update
+- helm install speedtest-exporter k8s-at-home/speedtest-exporter -f speedtest.yaml -n mon
 
-I recompiled the project using the commands I used above.  I changed the grafana service to be loadbalancer and redeployed.  PVC was created successfully.  
-
+The speedtest.yaml values file has some small tweaks, like time zone but most importantly enabling the podMonitor so Prometheus can scrape the exporter.
