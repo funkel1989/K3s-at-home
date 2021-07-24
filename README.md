@@ -255,13 +255,16 @@ To install kube-prometheus-stack all you need to do is:
 - helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 - helm repo update
 - helm install prometheus-stack prometheus-community/kube-prometheus-stack -n mon --create-namespace --values prom-stack-min.yaml
+
 I did override some chart values to use my NFS storage (even though this goes against Prometheus advice to use local storage, but I don't have much local storage and my setup is small so I'll try it and see how it goes).  I also specified some load balacer IPs as well.  One main this to note in the values are these line:
+
     serviceMonitorSelector: {}
     serviceMonitorNamespaceSelector: {}
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelector: {}
     podMonitorNamespaceSelector: {}
     podMonitorSelectorNilUsesHelmValues: false
+
 These essentailly tell the prometheus operator to pick up all serviceMonitors and podMonitors that are deployed in K3s (important to note that serviceMonitor and podMonitor are custom resource definitions in K3s).  If you leave the default values, Prometheus will only pickup prometheus selectors and speedtest-exporter isn't one of them.
 
 To install speedtest exporter, curtesy of https://github.com/k8s-at-home/charts
