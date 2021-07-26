@@ -4,7 +4,7 @@ metadata:
   labels:
     k8s-app: arm-exporter
   name: arm-exporter
-  namespace: monitoring
+  namespace: mon
 spec:
   selector:
     matchLabels:
