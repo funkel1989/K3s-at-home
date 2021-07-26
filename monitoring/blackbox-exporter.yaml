@@ -1,0 +1,30 @@
+serviceMonitor:
+  ## If true, a ServiceMonitor CRD is created for a prometheus operator
+  ## https://github.com/coreos/prometheus-operator
+  ##
+  enabled: true
+
+  # Default values that will be used for all ServiceMonitors created by `targets`
+  defaults:
+    additionalMetricsRelabels: {}
+    labels: {}
+    interval: 30s
+    scrapeTimeout: 30s
+    module: http_2xx
+
+  targets:
+    - name: duckduckgo.com             # Human readable URL that will appear in Prometheus / AlertManager
+      url: https://duckduckgo.com      # The URL that blackbox will scrape
+      labels: {}                       # Map of labels for ServiceMonitor. Overrides value set in `defaults`
+      interval: 60s                    # Scraping interval. Overrides value set in `defaults`
+      scrapeTimeout: 60s               # Scrape timeout. Overrides value set in `defaults`
+      module: http_2xx                 # Module used for scraping. Overrides value set in `defaults`
+      additionalMetricsRelabels: {}    # Map of metric labels and values to add
+    - name: github.com                 # Human readable URL that will appear in Prometheus / AlertManager
+      url: https://github.com      # The URL that blackbox will scrape
+      labels: {}                       # Map of labels for ServiceMonitor. Overrides value set in `defaults`
+      interval: 60s                    # Scraping interval. Overrides value set in `defaults`
+      scrapeTimeout: 60s               # Scrape timeout. Overrides value set in `defaults`
+      module: http_2xx                 # Module used for scraping. Overrides value set in `defaults`
+      additionalMetricsRelabels: {}    # Map of metric labels and values to add
+  

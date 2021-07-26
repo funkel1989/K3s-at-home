@@ -35,8 +35,12 @@ prometheus:
     type: LoadBalancer
 
 grafana:
-
+  
   adminPassword: admin
+
+  plugins:
+    - flant-statusmap-panel
+    - ae3e-plotly-panel
   
   service:
     loadBalancerIP: "10.0.0.3"

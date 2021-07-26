@@ -256,7 +256,7 @@ To install kube-prometheus-stack all you need to do is:
 - helm repo update
 - helm install prometheus-stack prometheus-community/kube-prometheus-stack -n mon --create-namespace --values prom-stack-min.yaml
 
-I did override some chart values to use my NFS storage (even though this goes against Prometheus advice to use local storage, but I don't have much local storage and my setup is small so I'll try it and see how it goes).  I also specified some load balacer IPs as well.  One main this to note in the values are these line:
+I did override some chart values to use my NFS storage (even though this goes against Prometheus advice to use local storage, but I don't have much local storage and my setup is small so I'll try it and see how it goes).  I also specified some load balacer IPs as well.   Note in the values are these line:
 
     serviceMonitorSelector: {}
     serviceMonitorNamespaceSelector: {}
@@ -273,3 +273,18 @@ To install speedtest exporter, curtesy of https://github.com/k8s-at-home/charts
 - helm install speedtest-exporter k8s-at-home/speedtest-exporter -f speedtest.yaml -n mon
 
 The speedtest.yaml values file has some small tweaks, like time zone but most importantly enabling the podMonitor so Prometheus can scrape the exporter.
+
+I also wanted to monitor up-time so the blackbox exporter was also deployed.  Blackbox exporter comes from https://github.com/k8s-at-home/charts as well.  I modified some values to specify I wanted a serviceMonitor and also the sites I wanted to ping.
+
+To install blackbox importer:
+
+- helm install blackbox-exporter prometheus-community/prometheus-blackbox-exporter -f blackbox-exporter.yaml -n mon
+
+I was then able to create a configmap for the speedtest and blackbox using the dashboard here:
+https://github.com/geerlingguy/internet-pi/blob/master/internet-monitoring/grafana/provisioning/dashboards/internet-connection.json
+Note I had to change the datasource from prometheus to Prometheus (there was a subtle difference in case).
+The config map will get picked up auto by the prom operator because the sidecar dashboards are enabled by default.
+
+Lastely I want to monitor the arm architecture specifcally the temperature.  
+
+
