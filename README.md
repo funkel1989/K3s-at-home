@@ -1,4 +1,4 @@
-Why and I doing this?  I work in tech and clustering interests me, also if my entire network is going to depend on a rasperberry pi for DNS, ad blocking, and DHCP, I might as well have some redundacy.
+Why am I doing this?  I work in tech and clustering interests me, also if my entire network is going to depend on a rasperberry pi for DNS, ad blocking, and DHCP, I might as well have some redundacy.
 Is this a lot of overhead for redundancy?... maybe... but again, it interests me, so why not :-) 
 Also, working from home requires a reliable network.
 
