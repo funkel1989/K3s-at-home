@@ -46,7 +46,7 @@ Raspberry OS defaults to using nftables instead of iptables. K3S networking feat
 - sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 - sudo reboot
 
-Standard Raspberry OS installations do not boot with cgroups enabled. K3S needs cgroups to start the systemd service. cgroups can be enabled by appending cgroup_memory=1 cgroup_enable=memory to /boot/cmdline.txt.
+Standard Raspberry OS installations does not boot without cgroups enabled. K3S needs cgroups to start the systemd service. cgroups can be enabled by appending cgroup_memory=1 cgroup_enable=memory to /boot/cmdline.txt.
 
 - sudo nano /boot/cmdline.txt
 append cgroup_memory=1 cgroup_enable=memory to the end of the line like so:
@@ -57,7 +57,7 @@ Now on to the cluster fun stuff.
 
 I prefer to use MetalLB instead of the stock K3s load balancer (Klipper) becuase MetalLB will assign 1 IP address per service for the entire cluster.  
 I do not need local storage, as it defeats the pupose of failover if the data for the pod isn't also on the node the pod is running on, I will be using other storage solutions later in this document.  
-I also prefer to use nginx ingress instead of Traefik.  Both of these swaps are optional.  It's just preference.  If you don't want them , you need to install K3s without these options:
+I also prefer to use nginx ingress instead of Traefik.  Both of these swaps are optional.  It's just preference.  If you don't want them, you should install K3s without these options:
 
 I installed master node with 
 - curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC=" --disable traefik --disable servicelb --disable local-storage" sh -
