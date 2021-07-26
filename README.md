@@ -108,16 +108,16 @@ sudo apt install open-iscsi.
 
 As well longhorn requires an ingress controller to access the frontend UI, I deployed ingress-nginx.
 
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm repo update
-helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx --create-namespace
-kubectl get all -n ingress-nginx
+- helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+- helm repo update
+- helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx --create-namespace
+- kubectl get all -n ingress-nginx
 
 Now you can install longhorn:
-helm repo add longhorn https://charts.longhorn.io
-helm repo update
-helm install longhorn longhorn/longhorn -n longhorn-system --create-namespace
-kubectl get all -n longhorn-system
+- helm repo add longhorn https://charts.longhorn.io
+- helm repo update
+- helm install longhorn longhorn/longhorn -n longhorn-system --create-namespace
+- kubectl get all -n longhorn-system
 
 Setup ingress for longhorn
 
@@ -139,7 +139,7 @@ I decided not all storage can be Longhorn and attached directly to the PIs in th
 
 If you have bare drives here is a [link to how to format them on linux](https://github.com/braucktoon/K3s-at-home/blob/main/etc/README.md)
 
-I decided to use [kube-prometheus-stack] (https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/README.md) (which has full multiarch support now) for monitoring.
+I decided to use [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/README.md) (which has full multiarch support now) for monitoring.
 
 To install kube-prometheus-stack all you need to do is:
 - helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
