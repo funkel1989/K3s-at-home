@@ -32,6 +32,7 @@ Copy SSH Key over - using ssh-copy-id [remote_username]@[server_ip_address] (ass
 - sudo reboot
 
 Hosts:
+
 kermit - 10.0.0.226
 
 fozzie - 10.0.0.227
