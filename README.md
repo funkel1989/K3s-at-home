@@ -33,7 +33,9 @@ Copy SSH Key over - using ssh-copy-id [remote_username]@[server_ip_address] (ass
 
 Hosts:
 kermit - 10.0.0.226
+
 fozzie - 10.0.0.227
+
 gonzo - 10.0.0.228
 
 Raspberry OS defaults to using nftables instead of iptables. K3S networking features require iptables and do not work with nftables. Follow the steps below to switch configure the OS to use legacy iptables:
