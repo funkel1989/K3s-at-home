@@ -129,7 +129,7 @@ Create the ingress:
 - kubectl -n longhorn-system apply -f [longhorn-ingress.yml](https://github.com/braucktoon/K3s-at-home/blob/main/longhorn/longhorn-ingress.yaml)
 test the ingress:
 - Kubectl get svc ingress-nginx-controller -n ingress-nginx
-- curl <external-ip>
+- curl < external-ip >
 
 On to NFS:
 I lied earlier, I actually have 4 raspberry pis in this solutions...I added another Raspberry PI 4 2GB to the deployment, it's acting as an NFS server:
@@ -138,6 +138,14 @@ dr-bunsen-honeydew - 10.0.0.229 (non-POE-hat, 2TB RAID 0 attached via USB, very 
 I decided not all storage can be Longhorn and attached directly to the PIs in the K3s cluster, so I added a new NFS server with some very old, but gently used HDDs. 
 
 If you have bare drives here is a [link to how to format them on linux](https://github.com/braucktoon/K3s-at-home/blob/main/etc/README.md)
+
+There is a cool project that will auto provision NFS storage for your K3s cluster: https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner
+
+To install using Helm:
+
+- helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+- helm repo update
+- helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner -n nfs --create-namespace --set nfs.server=10.0.0.229 --set nfs.path=/kubedata/data
 
 I decided to use [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/README.md) (which has full multiarch support now) for monitoring.
 
